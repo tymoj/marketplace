@@ -1,0 +1,11 @@
+{
+  "name": "explore-codebase",
+  "description": "Explores the codebase to gather context for a specific task or feature without making changes. Uses read-only tools to map architecture and identify patterns.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Claude Code Marketplace"
+  },
+  "keywords": ["exploration", "research", "context", "codebase", "analysis", "read-only"],
+  "category": "productivity",
+  "license": "MIT"
+}

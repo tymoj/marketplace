@@ -1,0 +1,11 @@
+{
+  "name": "implement-plan",
+  "description": "Implements a previously agreed-upon plan with parallel subagent coordination, test writing, and iterative course-correction. Works with plan files created by the advanced-plan skill.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Claude Code Marketplace"
+  },
+  "keywords": ["implementation", "coding", "testing", "parallel", "subagents", "workflow"],
+  "category": "productivity",
+  "license": "MIT"
+}

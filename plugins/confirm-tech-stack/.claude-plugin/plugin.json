@@ -1,0 +1,11 @@
+{
+  "name": "confirm-tech-stack",
+  "description": "Identifies the technologies used in the current project and asks the user to confirm which ones to use for a specific task. Prevents costly wrong-stack implementations.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Claude Code Marketplace"
+  },
+  "keywords": ["tech-stack", "framework", "discovery", "confirmation", "setup"],
+  "category": "productivity",
+  "license": "MIT"
+}

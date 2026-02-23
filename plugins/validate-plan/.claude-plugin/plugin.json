@@ -1,0 +1,11 @@
+{
+  "name": "validate-plan",
+  "description": "Validates a structured implementation plan for completeness, identifies gaps in requirements, and generates clarifying questions for the user before coding begins.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Claude Code Marketplace"
+  },
+  "keywords": ["validation", "planning", "requirements", "gaps", "quality-assurance", "review"],
+  "category": "productivity",
+  "license": "MIT"
+}

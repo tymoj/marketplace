@@ -1,0 +1,86 @@
+{
+  "name": "claude-code-skills",
+  "owner": {
+    "name": "Claude Code Marketplace",
+    "email": "marketplace@example.com"
+  },
+  "metadata": {
+    "description": "A curated collection of productivity skills for Claude Code following the Explore-Plan-Implement workflow. Includes tools for codebase exploration, tech-stack detection, planning, validation, implementation, and API documentation generation.",
+    "version": "1.0.0",
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "explore-codebase",
+      "source": "./plugins/explore-codebase",
+      "description": "Explores the codebase to gather context for a specific task or feature without making changes. Uses read-only tools to map architecture and identify patterns.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Claude Code Marketplace"
+      },
+      "category": "productivity",
+      "tags": ["exploration", "research", "context", "analysis", "read-only"],
+      "license": "MIT"
+    },
+    {
+      "name": "confirm-tech-stack",
+      "source": "./plugins/confirm-tech-stack",
+      "description": "Identifies the technologies used in the current project and asks the user to confirm which ones to use for a specific task. Prevents costly wrong-stack implementations.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Claude Code Marketplace"
+      },
+      "category": "productivity",
+      "tags": ["tech-stack", "framework", "discovery", "confirmation"],
+      "license": "MIT"
+    },
+    {
+      "name": "advanced-plan",
+      "source": "./plugins/advanced-plan",
+      "description": "Creates a detailed, step-by-step implementation plan using Explore-Plan-Implement best practices. Coordinates tech-stack confirmation, codebase exploration, and plan validation.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Claude Code Marketplace"
+      },
+      "category": "productivity",
+      "tags": ["planning", "architecture", "workflow", "agile", "best-practices"],
+      "license": "MIT"
+    },
+    {
+      "name": "validate-plan",
+      "source": "./plugins/validate-plan",
+      "description": "Validates a structured implementation plan for completeness, identifies gaps in requirements, and generates clarifying questions for the user before coding begins.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Claude Code Marketplace"
+      },
+      "category": "productivity",
+      "tags": ["validation", "planning", "requirements", "quality-assurance"],
+      "license": "MIT"
+    },
+    {
+      "name": "implement-plan",
+      "source": "./plugins/implement-plan",
+      "description": "Implements a previously agreed-upon plan with parallel subagent coordination, test writing, and iterative course-correction.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Claude Code Marketplace"
+      },
+      "category": "productivity",
+      "tags": ["implementation", "coding", "testing", "parallel", "subagents"],
+      "license": "MIT"
+    },
+    {
+      "name": "generate-openapi",
+      "source": "./plugins/generate-openapi",
+      "description": "Analyzes code and generates comprehensive OpenAPI 3.x specs that can be used directly with OpenAPI MCP servers. Produces fully compliant YAML/JSON with realistic examples.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Claude Code Marketplace"
+      },
+      "category": "api-tools",
+      "tags": ["openapi", "swagger", "api", "documentation", "mcp", "rest"],
+      "license": "MIT"
+    }
+  ]
+}
