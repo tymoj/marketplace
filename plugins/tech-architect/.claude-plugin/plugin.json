@@ -1,0 +1,10 @@
+{
+  "name": "tech-architect",
+  "version": "1.0.0",
+  "description": "Routes architecture and planning tasks to the right specialist agent by auto-detecting the project tech stack. Supports Spring Boot and general Java out of the box. New specialists can be added by dropping an agent file in agents/.",
+  "author": {
+    "name": "Cards Product Engineering Team"
+  },
+  "keywords": ["architecture", "spring-boot", "java", "routing", "planning"],
+  "license": "MIT"
+}

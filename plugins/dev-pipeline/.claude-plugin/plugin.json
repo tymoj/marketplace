@@ -1,0 +1,16 @@
+{
+  "name": "dev-pipeline",
+  "version": "1.1.0",
+  "description": "Universal SDLC orchestrator. Runs a 5-phase discovery → plan → implement → test → review pipeline for any tech stack. Bundles 17 specialist agents and 11 domain-knowledge skills. Phase 2 produces visual, validated plans with built-in gap analysis — no external planning plugin required.",
+  "author": {
+    "name": "Cards Product Engineering Team"
+  },
+  "keywords": [
+    "pipeline", "sdlc", "orchestration", "planning", "validation",
+    "spring-boot", "java", "nodejs", "python", "angular", "agile", "implementation"
+  ],
+  "optionalDependencies": {
+    "mermaid": "Enables Mermaid diagram generation for implementation plans in Phase 2. If not installed, the visualization step is skipped gracefully."
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "mermaid",
+  "version": "1.0.0",
+  "description": "Generate, validate, and render Mermaid diagrams with syntax-aware hooks and a specialized architect agent",
+  "author": {
+    "name": "Cards Product Engineering Team"
+  },
+  "keywords": ["mermaid", "diagrams", "flowchart", "visualization", "architecture"]
+}

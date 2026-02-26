@@ -1,0 +1,9 @@
+{
+  "name": "advanced-plugin-creator",
+  "version": "2.0.0",
+  "description": "Guide for creating, validating, and packaging Claude Code plugins and skills with best practices, frontmatter reference, helper scripts, and a structured plugin quality reviewer.",
+  "author": {
+    "name": "Cards Product Engineering Team"
+  },
+  "keywords": ["skills", "plugin-development", "scaffolding", "templates", "review", "validation"]
+}

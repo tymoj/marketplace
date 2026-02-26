@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/validate-mermaid.sh $TOOL_INPUT_FILE_PATH"
+          }
+        ]
+      }
+    ]
+  }
+}
