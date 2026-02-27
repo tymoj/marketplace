@@ -9,7 +9,7 @@ description: >-
 argument-hint: "[describe the feature, bug, or refactoring task]"
 context: fork
 agent: sonnet
-allowed-tools: Task(code-explorer, schema-researcher, api-contract-researcher, code-architect, jpa-expert, liquibase-expert, mysql-expert, oracle-expert, angular-expert, node-expert, python-expert, code-simplifier, test-generator, test-analyzer, code-reviewer, security-reviewer, silent-failure-hunter, mermaid-architect), Read, Write, Edit, Glob, Grep, Bash
+allowed-tools: Task(code-explorer, schema-researcher, api-contract-researcher, code-architect, jpa-expert, liquibase-expert, mysql-expert, oracle-expert, angular-expert, node-expert, python-expert, code-simplifier, test-generator, test-analyzer, code-reviewer, security-reviewer, silent-failure-hunter, mermaid-architect), TeamCreate, TeamDelete, TaskCreate, TaskList, TaskGet, TaskUpdate, SendMessage, Read, Write, Edit, Glob, Grep, Bash
 ---
 
 # Dev Pipeline — Universal SDLC Orchestrator
@@ -38,7 +38,7 @@ mkdir -p ".claude/pipeline/${TASK_ID}"
 echo "Pipeline task ID: ${TASK_ID}"
 ```
 
-Hold the resolved `TASK_ID` value (e.g. `task-20260226-1430-add-product-search-feature`) in memory for the entire pipeline run. Every file path from this point forward uses `.claude/pipeline/$TASK_ID/` as its root.
+Hold the resolved `TASK_ID` value (e.g. `task-crd-0001`) in memory for the entire pipeline run. Every file path from this point forward uses `.claude/pipeline/$TASK_ID/` as its root.
 
 Write the task manifest immediately:
 
@@ -242,72 +242,83 @@ Update `.claude/pipeline/$TASK_ID/task.md` — mark Phase 2 as `done`.
 
 ---
 
-## PHASE 3 — Implementation (Agent Teams)
+## PHASE 3 — Implementation
 
-Execute the approved plan using an Agent Team for parallel implementation with direct inter-agent messaging.
+Execute the approved plan. Use Agent Teams for parallel work when enabled, or fall back to sequential subagents.
 
-> **This phase uses Agent Teams.** Teammates work in their own sessions, can message each other directly, and coordinate via a shared task list. Requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in environment settings.
+### Step 0: Detect Execution Mode
 
-### Step 1: Prepare Tasks
+Check whether Agent Teams is available:
 
-Read `.claude/pipeline/$TASK_ID/plan.md` and `.claude/pipeline/$TASK_ID/stack.md`. Break the plan into discrete, file-scoped tasks. Each task must:
-- Touch a clear set of files (no overlapping file ownership between tasks)
-- Have defined inputs (what it depends on) and outputs (what it produces)
-- Be tagged with a domain: `db`, `backend`, `frontend`, `config`
-
-Identify task dependencies (e.g., DB migration → entity → service → controller).
-
-### Step 2: Spawn Teammates
-
-When spawning each teammate, substitute the **actual resolved task ID** (e.g. `task-20260226-1430-add-product-search-feature`) into the paths in their prompts — do not pass the template string `$TASK_ID`.
-
-**Backend teammate** (if backend work exists):
-> "You are implementing backend changes for: $ARGUMENTS. Read `.claude/pipeline/[TASK_ID]/plan.md` for the full plan and `.claude/pipeline/[TASK_ID]/stack.md` for the stack. Follow the spring-conventions, jpa-patterns, and rest-api-design skills. When you create or modify DB entities, message the db-teammate so they can create matching migrations. When you add or change API endpoints, message the frontend-teammate with the contract (URL, method, request/response shape)."
-- Handles: entities/models, services, controllers, DTOs, configuration
-
-**Database teammate** (if DB changes exist):
-> "You are implementing database migrations for: $ARGUMENTS. Read `.claude/pipeline/[TASK_ID]/plan.md` and `.claude/pipeline/[TASK_ID]/stack.md`. If the project uses Liquibase, use the `liquibase-expert` agent for changeset authoring and coordinate with the vendor-specific DB agent (mysql-expert/oracle-expert) for dialect-specific DDL. If the project uses Flyway or raw SQL, use the vendor-specific DB agent directly. When migrations are ready, message the backend-teammate so they can update entities to match."
-- Handles: migration scripts, indexes, constraints, seed data
-
-**Frontend teammate** (if frontend work exists):
-> "You are implementing frontend changes for: $ARGUMENTS. Read `.claude/pipeline/[TASK_ID]/plan.md` and `.claude/pipeline/[TASK_ID]/stack.md`. Follow the rest-api-design skill for API integration. Ask the backend-teammate for API contract details if not already in the plan. Message the backend-teammate if you need new endpoints or contract changes."
-- Handles: components, pages, state management, API integration, routing
-
-**Fullstack rule:** When both backend and frontend work exist, always spawn at least 2 teammates so they work in parallel and communicate API contracts directly.
-
-### Step 3: Create Task List
-
-Add all tasks to the shared task list with proper dependencies:
-
-```
-Task 1: Create DB migration for [tables]           → domain: db
-Task 2: Create/update entity [Entity]              → domain: backend, blocked by: Task 1
-Task 3: Implement service layer for [feature]      → domain: backend, blocked by: Task 2
-Task 4: Implement controller for [feature]         → domain: backend, blocked by: Task 3
-Task 5: Create [Component] component               → domain: frontend, blocked by: Task 4
-Task 6: Add page routing and state management      → domain: frontend, blocked by: Task 5
+```bash
+echo "${CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS:-0}"
 ```
 
-Teammates self-claim tasks as dependencies resolve. They message each other when a task produces output another teammate needs, a contract changes, or a blocker is discovered.
+- If `1` → use **Agent Teams mode** (Steps 1–5 below)
+- If `0` or unset → use **Sequential Subagent mode** (Step 6 below)
 
-### Step 4: Monitor and Finalize
+Tell the user which mode will be used before proceeding.
 
-1. Wait for all teammates to complete their tasks
-2. If any teammate is stuck, intervene by messaging them directly
-3. Verify no file conflicts between teammates' work
-4. Collect implementation summary from each teammate
-5. Log all completed work to `.claude/pipeline/$TASK_ID/implementation-log.md`
+---
 
-### Fallback: If Agent Teams is Unavailable
+### Agent Teams Mode (Steps 1–5)
 
-If `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` is not enabled, fall back to sequential sub-agent execution:
+> Teammates are full, independent Claude Code sessions that share a task list and message each other directly. Each teammate has its own context window.
 
-- DB migration → `liquibase-expert` (if Liquibase detected) or `mysql-expert` / `oracle-expert`
-- Entity/model → `jpa-expert` (Java) or appropriate backend agent
-- Service/controller → appropriate backend agent (see tech-router skill)
-- Frontend → `angular-expert`
+#### Step 1: Create the Team
 
-Log each completed task to `.claude/pipeline/$TASK_ID/implementation-log.md`.
+Use `TeamCreate` with `team_name: "pipeline-$TASK_ID"`.
+
+#### Step 2: Create Tasks
+
+Read `.claude/pipeline/$TASK_ID/plan.md` and `.claude/pipeline/$TASK_ID/stack.md`. Break the plan into discrete, file-scoped tasks. Each task must have no overlapping file ownership, defined inputs/outputs, and a domain tag (`db`, `backend`, `frontend`, `config`).
+
+Use `TaskCreate` for each task, then `TaskUpdate` with `addBlockedBy` for dependencies (e.g., DB migration → entity → service → controller). Aim for 5–6 tasks per teammate.
+
+#### Step 3: Spawn Teammates
+
+Use the `Task` tool with `team_name: "pipeline-$TASK_ID"`, `subagent_type: "general-purpose"`, and a descriptive `name`. Substitute the **actual resolved task ID** into all paths — never pass the literal `$TASK_ID`.
+
+Every teammate prompt must include these **coordination rules**:
+> Check `TaskList` for available tasks. Claim with `TaskUpdate` (set `owner` to your name), prefer lowest ID first. When your work produces output another teammate needs, use `SendMessage` to notify them by name. Mark tasks completed via `TaskUpdate` when done, then check `TaskList` for next work.
+
+**Spawn these teammates based on scope:**
+
+| Name | Spawn if | Prompt context | Handles |
+|---|---|---|---|
+| `backend` | backend work exists | Read plan + stack. Follow spring-conventions, jpa-patterns, rest-api-design skills. Message `db` when entities change. Message `frontend` with API contracts. | entities, services, controllers, DTOs, config |
+| `db` | DB changes exist | Read plan + stack. Use `liquibase-expert` agent (via Task tool) for Liquibase, or vendor-specific DB agent for Flyway/raw SQL. Message `backend` when migrations are ready. | migrations, indexes, constraints, seed data |
+| `frontend` | frontend work exists | Read plan + stack. Follow rest-api-design skill. Ask `backend` for API contracts if not in plan. | components, pages, state, API integration, routing |
+
+**Fullstack rule:** When both backend and frontend work exist, always spawn at least 2 teammates so they work in parallel and communicate API contracts via `SendMessage`.
+
+#### Step 4: Assign Initial Tasks
+
+Use `TaskUpdate` with the `owner` parameter to assign the first unblocked tasks to each teammate. Teammates self-claim subsequent tasks as dependencies resolve.
+
+#### Step 5: Monitor and Finalize
+
+1. Teammate messages arrive automatically — do NOT poll or sleep
+2. Use `TaskList` periodically to check progress
+3. If stuck, use `SendMessage` to give guidance
+4. When all tasks are complete, log to `.claude/pipeline/$TASK_ID/implementation-log.md`
+5. Send `shutdown_request` to each teammate via `SendMessage`
+6. After all teammates confirm shutdown, clean up with `TeamDelete`
+
+---
+
+### Step 6: Sequential Subagent Fallback
+
+If Agent Teams is not enabled, execute the plan sequentially using the `Task` tool to spawn subagents:
+
+1. DB migration → `liquibase-expert` (if Liquibase) or `mysql-expert` / `oracle-expert`
+2. Entity/model → `jpa-expert` (Java) or appropriate backend agent (see tech-router skill)
+3. Service/controller → appropriate backend agent
+4. Frontend → `angular-expert`
+
+Log each completed step to `.claude/pipeline/$TASK_ID/implementation-log.md`.
+
+---
 
 Update `.claude/pipeline/$TASK_ID/task.md` — mark Phase 3 as `done`.
 

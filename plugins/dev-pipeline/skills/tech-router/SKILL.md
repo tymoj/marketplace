@@ -14,8 +14,8 @@ When a technical task arrives, identify the domain and route to the correct spec
 | MySQL native SQL, EXPLAIN, indexes, Flyway (MySQL DDL) | `mysql-expert` |
 | Oracle native SQL, PL/SQL, sequences, Flyway (Oracle DDL) | `oracle-expert` |
 | Liquibase changelogs, changesets, rollback, preconditions, Spring Boot Liquibase config | `liquibase-expert` |
-| RabbitMQ, Spring AMQP, exchanges, queues, listeners, producers, DLQ | `jpa-expert` (with `rabbitmq-patterns` skill) |
-| Spring Security, JWT, OAuth2, CORS, authentication, authorization | `jpa-expert` (with `spring-security-patterns` skill) |
+| RabbitMQ, Spring AMQP, exchanges, queues, listeners, producers, DLQ | Backend teammate (load `rabbitmq-patterns` skill) |
+| Spring Security, JWT, OAuth2, CORS, authentication, authorization | Backend teammate (load `spring-security-patterns` skill) |
 | Node.js, Express, Fastify, NestJS | `node-expert` |
 | Python, FastAPI, Django, Flask, SQLAlchemy | `python-expert` |
 
@@ -37,7 +37,7 @@ When a technical task arrives, identify the domain and route to the correct spec
 
 | Situation | Route to Agent |
 |---|---|
-| Before any structural change | `architecture-researcher` (plan mode) |
+| Before any structural change | `code-explorer` (plan mode) |
 | Before any DB/schema change | `schema-researcher` (plan mode) |
 | Before any API change | `api-contract-researcher` (plan mode) |
 | After any code change | `code-reviewer` |
@@ -60,6 +60,6 @@ When a technical task arrives, identify the domain and route to the correct spec
 4. After any security-sensitive change, proactively run security-reviewer
 5. For RabbitMQ tasks, load `rabbitmq-patterns` skill alongside the implementation agent
 6. For security tasks (auth, JWT, CORS), load `spring-security-patterns` skill
-7. If stack is unknown, read `.claude/pipeline/stack.md`
+7. If stack is unknown, read `.claude/pipeline/$TASK_ID/stack.md`
 8. If that file doesn't exist, read `pom.xml`, `package.json`, `requirements.txt`
 9. Never assume a stack without evidence from project files
