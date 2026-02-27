@@ -5,5 +5,6 @@
   "author": {
     "name": "Cards Product Engineering Team"
   },
-  "keywords": ["skills", "plugin-development", "scaffolding", "templates", "review", "validation"]
+  "keywords": ["skills", "plugin-development", "scaffolding", "templates", "review", "validation"],
+  "license": "MIT"
 }
