@@ -5,7 +5,7 @@ Generate, validate, and render Mermaid diagrams with syntax-aware hooks and a sp
 ## Installation
 
 ```bash
-claude plugin install mermaid@<marketplace-name>
+claude plugin install mermaid@tymoj/marketplace
 ```
 
 Or load locally for testing:

@@ -5,7 +5,7 @@ Universal SDLC orchestrator for Claude Code. Runs a 5-phase development pipeline
 ## Installation
 
 ```bash
-claude plugin install dev-pipeline@<marketplace-name>
+claude plugin install dev-pipeline@tymoj/marketplace
 ```
 
 Or load locally for testing:

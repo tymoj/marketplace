@@ -5,7 +5,7 @@ Guide for creating, validating, and packaging Claude Code plugins and skills. In
 ## Installation
 
 ```bash
-claude plugin install advanced-plugin-creator@<marketplace-name>
+claude plugin install advanced-plugin-creator@tymoj/marketplace
 ```
 
 Or load locally for testing:

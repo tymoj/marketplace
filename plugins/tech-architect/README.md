@@ -5,7 +5,7 @@ Routes architecture and planning tasks to the right specialist agent by auto-det
 ## Installation
 
 ```bash
-claude plugin install tech-architect@<marketplace-name>
+claude plugin install tech-architect@tymoj/marketplace
 ```
 
 Or load locally for testing:
