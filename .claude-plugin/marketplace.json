@@ -5,69 +5,58 @@
     "email": "marketplace@example.com"
   },
   "metadata": {
-    "description": "A curated collection of productivity skills for Claude Code following the Explore-Plan-Implement workflow. Includes tools for codebase exploration, tech-stack detection, planning, validation, implementation, and API documentation generation.",
-    "version": "1.0.0",
+    "description": "A curated collection of plugins for Claude Code — from full SDLC orchestration and architecture planning to Mermaid diagrams and plugin authoring.",
+    "version": "2.0.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
     {
-      "name": "explore-codebase",
-      "source": "./plugins/explore-codebase",
-      "description": "Explores the codebase to gather context for a specific task or feature without making changes. Uses read-only tools to map architecture and identify patterns.",
+      "name": "dev-pipeline",
+      "source": "./plugins/dev-pipeline",
+      "description": "Universal SDLC orchestrator. Runs a 5-phase development pipeline (discovery, planning, implementation, testing, review) for any tech stack with 17 specialist agents and 11 domain skills.",
       "version": "1.0.0",
       "author": {
         "name": "Claude Code Marketplace"
       },
       "category": "productivity",
-      "tags": ["exploration", "research", "context", "analysis", "read-only"],
-      "license": "MIT"
+      "tags": ["sdlc", "orchestrator", "pipeline", "implementation", "testing", "code-review", "multi-stack"],
+      "license": "MIT",
+      "optionalDependencies": ["mermaid"]
     },
     {
-      "name": "confirm-tech-stack",
-      "source": "./plugins/confirm-tech-stack",
-      "description": "Identifies the technologies used in the current project and asks the user to confirm which ones to use for a specific task. Prevents costly wrong-stack implementations.",
+      "name": "tech-architect",
+      "source": "./plugins/tech-architect",
+      "description": "Routes architecture and planning tasks to specialist agents by auto-detecting your project's tech stack. Includes Spring Boot, Java, and Oracle architect agents.",
       "version": "1.0.0",
       "author": {
         "name": "Claude Code Marketplace"
       },
       "category": "productivity",
-      "tags": ["tech-stack", "framework", "discovery", "confirmation"],
+      "tags": ["architecture", "planning", "tech-stack", "routing", "spring-boot", "java", "oracle"],
       "license": "MIT"
     },
     {
-      "name": "validate-plan",
-      "source": "./plugins/validate-plan",
-      "description": "Validates a structured implementation plan for completeness, identifies gaps in requirements, and generates clarifying questions for the user before coding begins.",
+      "name": "mermaid",
+      "source": "./plugins/mermaid",
+      "description": "Generate, validate, and render Mermaid diagrams with syntax-aware hooks and a specialized architect agent. Supports flowchart, sequence, class, state, ER, Gantt, and pie diagrams.",
       "version": "1.0.0",
       "author": {
         "name": "Claude Code Marketplace"
       },
       "category": "productivity",
-      "tags": ["validation", "planning", "requirements", "quality-assurance"],
+      "tags": ["mermaid", "diagrams", "visualization", "architecture", "documentation"],
       "license": "MIT"
     },
     {
-      "name": "implement-plan",
-      "source": "./plugins/implement-plan",
-      "description": "Implements a previously agreed-upon plan with parallel subagent coordination, test writing, and iterative course-correction.",
+      "name": "advanced-plugin-creator",
+      "source": "./plugins/advanced-plugin-creator",
+      "description": "Guide for creating, validating, and packaging Claude Code plugins and skills. Includes best practices, frontmatter reference, helper scripts, and a structured plugin quality reviewer.",
       "version": "1.0.0",
       "author": {
         "name": "Claude Code Marketplace"
       },
-      "category": "productivity",
-      "tags": ["implementation", "coding", "testing", "parallel", "subagents"],
-      "license": "MIT"
-    },
-    {
-      "name": "generate-openapi",
-      "source": "./plugins/generate-openapi",
-      "description": "Analyzes code and generates comprehensive OpenAPI 3.x specs that can be used directly with OpenAPI MCP servers. Produces fully compliant YAML/JSON with realistic examples.",
-      "version": "1.0.0",
-      "author": {
-        "name": "Claude Code Marketplace"
-      },
-      "category": "api-tools",
-      "tags": ["openapi", "swagger", "api", "documentation", "mcp", "rest"],
+      "category": "tooling",
+      "tags": ["plugin", "skill", "authoring", "scaffolding", "validation", "packaging"],
       "license": "MIT"
     }
   ]
