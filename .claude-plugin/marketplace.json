@@ -20,8 +20,7 @@
       },
       "category": "productivity",
       "tags": ["sdlc", "orchestrator", "pipeline", "implementation", "testing", "code-review", "multi-stack"],
-      "license": "MIT",
-      "optionalDependencies": ["mermaid"]
+      "license": "MIT"
     },
     {
       "name": "tech-architect",
