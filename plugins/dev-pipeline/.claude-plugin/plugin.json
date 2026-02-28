@@ -9,8 +9,5 @@
     "pipeline", "sdlc", "orchestration", "planning", "validation",
     "spring-boot", "java", "nodejs", "python", "angular", "agile", "implementation"
   ],
-  "optionalDependencies": {
-    "mermaid": "Enables Mermaid diagram generation for implementation plans in Phase 2. If not installed, the visualization step is skipped gracefully."
-  },
   "license": "MIT"
 }
