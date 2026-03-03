@@ -11,8 +11,8 @@
   },
   "plugins": [
     {
-      "name": "dev-pipeline",
-      "source": "./plugins/dev-pipeline",
+      "name": "conductor",
+      "source": "./plugins/conductor",
       "description": "Universal SDLC orchestrator. Runs a 5-phase development pipeline (discovery, planning, implementation, testing, review) for any tech stack with 17 specialist agents and 11 domain skills.",
       "version": "1.0.0",
       "author": {
