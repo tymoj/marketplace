@@ -7,6 +7,9 @@ skills:
   - rest-api-design
   - frontend-design
   - testing-strategy
+  - design-md
+  - angular-components
+  - angular-material
 memory: project
 ---
 

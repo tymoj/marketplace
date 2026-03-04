@@ -1,0 +1,57 @@
+{
+  "framework": "Angular 21",
+  "uiLibrary": "Angular Material 21 (M3)",
+  "theme": {
+    "type": "light",
+    "colors": {
+      "primary": "#19e66f",
+      "secondary": "#8A2BE2",
+      "tertiary": "#D0A9F5",
+      "background": {
+        "light": "#f6f8f7",
+        "dark": "#112118",
+        "elevated": "#1e2c22"
+      }
+    },
+    "angularMaterialTokens": {
+      "--mat-primary": "var(--brand-primary)",
+      "--mat-on-primary": "#FFFFFF",
+      "--mat-primary-container": "#d7f5e3",
+      "--mat-surface": "#f6f8f7",
+      "--mat-surface-variant": "#e8f0ea",
+      "--mat-on-surface": "#1a1c1a",
+      "--mat-on-surface-variant": "#414941"
+    },
+    "typography": {
+      "display": ["Space Grotesk", "sans-serif"],
+      "body": ["Roboto", "sans-serif"],
+      "icons": "Material Symbols Outlined"
+    },
+    "spacing": {
+      "toolbar-height": "64px",
+      "container-max": "1200px",
+      "card-padding": "16px",
+      "section-gap": "32px"
+    },
+    "shape": {
+      "card": "12px",
+      "button": "20px",
+      "input": "4px",
+      "chip": "8px"
+    }
+  },
+  "componentDefaults": {
+    "changeDetection": "OnPush",
+    "standalone": true,
+    "styleType": "scss",
+    "useSignals": true,
+    "avoidNgModules": true
+  },
+  "lintRules": {
+    "noHardcodedColors": true,
+    "requireReadonlyInterfaces": true,
+    "requireInputSignals": true,
+    "requireOutputFunctions": true,
+    "requireOnPush": true
+  }
+}

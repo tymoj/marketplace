@@ -1,0 +1,13 @@
+{
+  "name": "angular-components",
+  "version": "1.0.0",
+  "description": "Stitch design-to-Angular 21 component converter skill",
+  "type": "module",
+  "scripts": {
+    "validate": "node scripts/validate.js",
+    "fetch": "bash scripts/fetch-stitch.sh"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

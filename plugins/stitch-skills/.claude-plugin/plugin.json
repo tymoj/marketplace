@@ -1,0 +1,12 @@
+{
+  "name": "stitch-skills",
+  "version": "1.0.0",
+  "description": "Stitch Skills adapted for Angular 21, Angular CLI MCP, and Playwright MCP. Converts Google Stitch designs into production Angular 21 route components, design systems, and full app flows.",
+  "author": {
+    "name": "Cards Product Engineering Team"
+  },
+  "keywords": [
+    "angular", "stitch", "angular-material", "playwright", "design-to-code", "ui", "frontend"
+  ],
+  "license": "Apache-2.0"
+}
