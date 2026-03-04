@@ -1,0 +1,7 @@
+# IDE
+.idea/
+
+# Claude Code local state
+.claude/agents/
+.claude/pipeline/
+.claude/skills/
