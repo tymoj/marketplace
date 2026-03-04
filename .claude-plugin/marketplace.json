@@ -23,18 +23,6 @@
       "license": "MIT"
     },
     {
-      "name": "tech-architect",
-      "source": "./plugins/tech-architect",
-      "description": "Routes architecture and planning tasks to specialist agents by auto-detecting your project's tech stack. Includes Spring Boot, Java, and Oracle architect agents.",
-      "version": "1.0.0",
-      "author": {
-        "name": "Claude Code Marketplace"
-      },
-      "category": "productivity",
-      "tags": ["architecture", "planning", "tech-stack", "routing", "spring-boot", "java", "oracle"],
-      "license": "MIT"
-    },
-    {
       "name": "mermaid",
       "source": "./plugins/mermaid",
       "description": "Generate, validate, and render Mermaid diagrams with syntax-aware hooks and a specialized architect agent. Supports flowchart, sequence, class, state, ER, Gantt, and pie diagrams.",
