@@ -1,5 +1,5 @@
 {
-  "name": "stitch-skills",
+  "name": "ui-builder",
   "version": "1.0.0",
   "description": "Stitch Skills adapted for Angular 21, Angular CLI MCP, and Playwright MCP. Converts Google Stitch designs into production Angular 21 route components, design systems, and full app flows.",
   "author": {

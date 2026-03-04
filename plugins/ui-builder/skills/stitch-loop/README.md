@@ -7,7 +7,7 @@ Each cycle generates a Stitch screen, converts it to an Angular route component,
 ## Install
 
 ```bash
-bash plugins/stitch-skills/install.sh
+bash plugins/ui-builder/install.sh
 ```
 
 ## Required MCPs

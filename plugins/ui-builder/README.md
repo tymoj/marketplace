@@ -1,17 +1,17 @@
-# stitch-skills
+# ui-builder
 
 Stitch Skills adapted for **Angular 21**, **Angular CLI MCP**, and **Playwright MCP**.
 
 Converts Google Stitch designs into production Angular 21 route components, design systems, and full app flows.
 
-Original: https://github.com/google-labs-code/stitch-skills | License: Apache-2.0
+Original: https://github.com/google-labs-code/ui-builder | License: Apache-2.0
 
 ## Quick Start
 
 **1. Install the plugin**
 
 ```bash
-claude plugin install stitch-skills@tymoj/marketplace
+claude plugin install ui-builder@tymoj/marketplace
 ```
 
 **2. Add MCPs to `.claude/settings.json`** in your project
@@ -44,13 +44,13 @@ Run stitch-loop to build the next page in my Angular app's roadmap
 ## Installation
 
 ```bash
-claude plugin install stitch-skills@tymoj/marketplace
+claude plugin install ui-builder@tymoj/marketplace
 ```
 
 Or load locally:
 
 ```bash
-claude --plugin-dir ./plugins/stitch-skills
+claude --plugin-dir ./plugins/ui-builder
 ```
 
 ## Using with conductor
@@ -73,14 +73,14 @@ Then reinstall both plugins:
 
 ```bash
 claude plugin install conductor@tymoj/marketplace
-claude plugin install stitch-skills@tymoj/marketplace
+claude plugin install ui-builder@tymoj/marketplace
 ```
 
 Or locally:
 
 ```bash
 bash plugins/conductor/install.sh
-bash plugins/stitch-skills/install.sh
+bash plugins/ui-builder/install.sh
 ```
 
 After this, when conductor routes to `angular-expert` in Phase 3, it will apply Stitch design tokens, Angular Material theming, and Angular 21 component patterns automatically.

@@ -5,7 +5,7 @@ Transforms vague Stitch generation prompts into structured, Angular-specific pro
 ## Install
 
 ```bash
-bash plugins/stitch-skills/install.sh
+bash plugins/ui-builder/install.sh
 ```
 
 ## Example Prompt

@@ -7,7 +7,7 @@ Output includes an **Angular Material M3 theme mapping** section for direct use 
 ## Install
 
 ```bash
-bash plugins/stitch-skills/install.sh
+bash plugins/ui-builder/install.sh
 ```
 
 ## Example Prompt

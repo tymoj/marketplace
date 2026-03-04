@@ -9,7 +9,7 @@ Converts Stitch designs into Angular 21 standalone components with:
 ## Install
 
 ```bash
-bash plugins/stitch-skills/install.sh
+bash plugins/ui-builder/install.sh
 ```
 
 ## Required MCPs
