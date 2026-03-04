@@ -1,12 +1,12 @@
 {
   "name": "ui-builder",
   "version": "1.0.0",
-  "description": "Stitch Skills adapted for Angular 21, Angular CLI MCP, and Playwright MCP. Converts Google Stitch designs into production Angular 21 route components, design systems, and full app flows.",
+  "description": "Convert local design images (PNG, JPG, Figma exports, screenshots) into production Angular 21 standalone components with Angular Material. Reads images natively — no Stitch MCP required. Supports forms, tables, dashboards, and autonomous page-by-page app building.",
   "author": {
     "name": "Cards Product Engineering Team"
   },
   "keywords": [
-    "angular", "stitch", "angular-material", "playwright", "design-to-code", "ui", "frontend"
+    "angular", "angular-material", "playwright", "design-to-code", "image-to-code", "ui", "frontend", "forms"
   ],
   "license": "Apache-2.0"
 }

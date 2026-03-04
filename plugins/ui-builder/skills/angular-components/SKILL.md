@@ -1,368 +1,254 @@
 ---
-name: angular:components
-description: Converts Stitch designs into Angular 21 standalone components. Uses Angular CLI MCP for scaffolding and best practices, Playwright MCP for visual verification against the original design.
-allowed-tools:
-  - "stitch*:*"
-  - "angular*:*"
-  - "playwright*:*"
-  - "Bash"
-  - "Read"
-  - "Write"
-  - "web_fetch"
+name: image-to-angular
+description: >-
+  Converts local design images (PNG, JPG, Figma exports, screenshots, mockups)
+  into production-ready Angular 21 standalone components with Angular Material.
+  Reads images natively via Read tool — no Stitch MCP required.
+  Supports forms, tables, dashboards, and any UI pattern.
+user-invocable: true
 ---
 
-# Angular Components Skill
+# image-to-angular
 
-Converts Stitch MCP designs into production-ready Angular 21 standalone components using signals, Angular Material, and Playwright visual testing.
+Convert any design image into a pixel-close Angular 21 component with Angular Material.
 
-## Prerequisites
+## Input
 
-Ensure both MCPs are configured in `.claude/settings.json`:
-
-```json
-{
-  "mcpServers": {
-    "angular": {
-      "command": "npx",
-      "args": ["-y", "@angular/cli", "mcp"]
-    },
-    "playwright": {
-      "command": "npx",
-      "args": ["-y", "@playwright/mcp@latest"]
-    }
-  }
-}
-```
+Provide:
+1. **Image path(s)** — e.g. `designs/checkout.png`, `mockups/dashboard.jpg`
+2. **Component name** — PascalCase, e.g. `CheckoutFormComponent`
+3. **Route** (optional) — e.g. `checkout` (omit for presentational components)
+4. **Feature folder** (optional) — e.g. `checkout` (defaults to kebab-case of component name)
 
 ## Workflow
 
-### Step 1: Discover MCP Tools
+### Step 1: Read Design Images
 
-Run `list_tools` to identify:
-- **Stitch prefix** (e.g., `stitch:`, `mcp_stitch:`)
-- **Angular prefix** — verify `angular:list_projects`, `angular:get_best_practices` are available
-- **Playwright prefix** — verify `playwright:browser_navigate`, `playwright:browser_snapshot` are available
-- **Experimental Angular tools** — check for `angular:devserver.start`, `angular:build`, `angular:test`
+Use the **Read tool** to load every provided image. Read all images before analyzing.
 
-### Step 2: Retrieve Stitch Design
+For multiple images (e.g., default state + error state + mobile), read them all — they provide complementary information about the component's states and responsive behavior.
 
-```
-[stitch-prefix]:get_screen projectId="[PROJECT_ID]" screenId="[SCREEN_ID]"
-```
+### Step 2: Analyze the Design
 
-Key fields from response:
-- `htmlCode.downloadUrl` — design HTML (requires curl, not AI web fetch)
-- `screenshot.downloadUrl` — reference screenshot for visual comparison
-- `deviceType` — typically `DESKTOP` (2560px viewport)
+Work through the image systematically using the image-analysis-guide.md checklist:
 
-Download HTML via curl to handle GCS redirects:
+**Layout:**
+- Overall structure (single column / two column / sidebar+content / grid / centered card)
+- Container max-width
+- Section hierarchy and visual grouping
+- Spacing between elements
 
-```bash
-bash scripts/fetch-stitch.sh "[htmlCode.downloadUrl]" "temp/source.html"
-```
+**Color roles** (record exact hex for each):
+- Background, Surface, Primary action, Text primary/secondary, Border, Error, Success
 
-Also download screenshot for Playwright comparison:
+**Typography:**
+- Font family (infer from letterforms), heading sizes, body size, label size
 
-```bash
-bash scripts/fetch-stitch.sh "[screenshot.downloadUrl]" "temp/reference-screenshot.png"
-```
+**Component inventory** — for every visible element:
+- What it is visually
+- Its Angular Material equivalent
+- Its visual state (default, focused, error, disabled, loading)
 
-### Step 3: Angular Project Discovery
+**Form field analysis** (if the design contains a form):
 
-1. `angular:list_projects` → identify app name and existing structure
-2. `angular:get_best_practices` → load Angular 21 patterns (signals, standalone, zoneless)
-3. `angular:search_documentation query="standalone components input output signals"` → API reference
-4. `angular:find_examples` → relevant official examples
+For every form field, record:
+| # | Label | Input type | Placeholder | Required | Validation hints | Error message |
+|---|---|---|---|---|---|---|
+| 1 | [label] | [text/email/password/number/tel/date/select/checkbox/radio/textarea] | [placeholder] | [yes/no] | [min length, format, range] | [error text if shown] |
 
-Review existing project structure:
-```bash
-find src/app -type f -name "*.ts" | head -30
-```
+**Interactive elements:**
+- Button labels, types (submit/button/reset), visual style (filled/outlined/text)
+- Icon names (infer from shape — search, close, chevron, add, delete, etc.)
+- Navigation links
+
+### Step 3: Map to Angular Material
+
+Produce a mapping table:
+
+| Design Element | Angular Material | Module Import |
+|---|---|---|
+| [element] | [component] | [MatXxxModule] |
 
 ### Step 4: Plan Component Architecture
 
-From the HTML source, identify components:
-- **Smart components** (have services, routing, state): pages, containers
-- **Dumb/presentational components** (props-only): cards, list items, headers, forms
+Decide:
+- **Smart vs presentational**: route components are smart (fetch data, manage state); shared components are presentational (inputs/outputs only)
+- **Inputs**: what data does this component receive?
+- **Outputs**: what events does it emit?
+- **Local state**: what signals does it need?
+- **Services**: what does it inject?
+- **Form**: does it need a reactive form? What validators?
 
-Plan file structure:
-```
-src/
-├── app/
-│   ├── [feature]/
-│   │   ├── components/
-│   │   │   ├── [component].component.ts
-│   │   │   ├── [component].component.scss
-│   │   │   └── [component].component.spec.ts
-│   │   ├── [feature].routes.ts
-│   │   └── models/
-│   │       └── [feature].model.ts
-│   └── shared/
-│       └── data/
-│           └── mock-data.ts
-```
+### Step 5: Discover Angular Project
 
-### Step 5: Install Dependencies (if needed)
+Check for `angular.json` to confirm the workspace. Use Angular CLI MCP if available:
+- `angular:list_projects` — confirm app name and root
+- `angular:get_best_practices` — confirm Angular version-specific patterns
 
+### Step 6: Install Angular Material (if not present)
+
+Check `package.json` for `@angular/material`. If missing:
 ```bash
-# Angular Material (if not installed)
 ng add @angular/material
-
-# Or via npm
-npm install @angular/material @angular/cdk @angular/animations
 ```
+Confirm `provideAnimationsAsync()` is in `app.config.ts`.
 
-### Step 6: Generate Component Scaffolding
-
-Use Angular CLI to generate properly structured components:
+### Step 7: Scaffold the Component
 
 ```bash
-ng generate component [feature]/components/[component-name] \
+ng generate component [feature]/[component-name] \
   --standalone \
   --style=scss \
   --change-detection=OnPush \
-  --skip-tests=false
+  --skip-tests
 ```
 
-Or if `angular:build` experimental tool is available, use Angular MCP for scaffolding guidance.
+### Step 8: Implement the Component
 
-### Step 7: Implement Angular 21 Component
+Follow Angular 21 patterns strictly:
 
-Use `resources/component-template.ts` as the base. Apply these rules:
-
-**Angular 21 Patterns:**
 ```typescript
-import {
-  Component, input, output, signal, computed, effect,
-  inject, ChangeDetectionStrategy, OnInit
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
+import { MatCardModule } from '@angular/material/card';
+// ... other Material imports
+
+interface [ComponentName]Data {
+  // TypeScript interface matching the design's data model
+}
 
 @Component({
-  selector: 'app-[name]',
-  standalone: true,                                    // Always standalone
-  changeDetection: ChangeDetectionStrategy.OnPush,     // Always OnPush
+  selector: 'app-[component-name]',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    // Import Angular Material modules directly
-    MatCardModule, MatButtonModule, MatIconModule,
-    // Import Angular common directives
-    NgFor, NgIf, AsyncPipe, DatePipe,
+    // Only import what this component uses
+    MatCardModule,
   ],
-  templateUrl: './[name].component.html',   // or template: `...`
-  styleUrl: './[name].component.scss',
+  template: `
+    <!-- Use new control flow: @if, @for (track), @switch, @let -->
+  `,
+  styles: [`
+    /* CSS custom properties using --mat-* tokens, not hardcoded hex */
+  `],
 })
-export class [Name]Component {
-  // Inputs: use signal-based input() NOT @Input() decorator
-  title = input.required<string>();
-  subtitle = input<string>('');
-  items = input<Item[]>([]);
+export class [ComponentName]Component {
+  // Inputs — signal-based, never @Input()
+  data = input.required<[ComponentName]Data>();
 
-  // Outputs: use output() NOT @Output() + EventEmitter
-  itemSelected = output<Item>();
-  actionClicked = output<void>();
+  // Outputs — never @Output() + EventEmitter
+  actionClicked = output<string>();
 
-  // Internal state: use signal()
-  private readonly selectedIndex = signal(-1);
+  // Local state — signal()
+  isLoading = signal(false);
 
-  // Services: inject() function NOT constructor injection
+  // Derived state — computed()
+  displayValue = computed(() => this.data().someField);
+
+  // DI — inject(), never constructor injection
   private readonly router = inject(Router);
-  private readonly dataService = inject(DataService);
-
-  // Derived state: computed()
-  readonly selectedItem = computed(() =>
-    this.items()[this.selectedIndex()] ?? null
-  );
-  readonly hasItems = computed(() => this.items().length > 0);
-
-  // Side effects: effect() for reactive side effects
-  private readonly titleEffect = effect(() => {
-    document.title = this.title();
-  });
-
-  // Methods
-  selectItem(index: number): void {
-    this.selectedIndex.set(index);
-    this.itemSelected.emit(this.items()[index]);
-  }
 }
 ```
 
-**Styling Rules:**
-- SCSS files, no inline styles
-- Use Angular Material CSS variables (`--mat-*`) for colors
-- Use `mat.m3-theme` mixins for component-level theming
-- No hardcoded hex values in templates or SCSS
-- Use Angular CDK Layout for responsive breakpoints
+**Template rules:**
+- Use `@if (condition) { } @else { }` — never `*ngIf`
+- Use `@for (item of items(); track item.id) { }` — never `*ngFor`
+- Use `@switch (value()) { @case ('x') { } }` — never `ngSwitch`
+- Use `@let label = computedValue();` for local template variables
 
-**Template Rules:**
-- Use `@for` / `@if` / `@switch` control flow (Angular 17+ syntax, not `*ngFor` / `*ngIf`)
-- Use `@let` for local variable bindings
-- Use `(click)` for events, `[attr]` for property bindings, `{{ }}` for interpolation
-- Prefer `matInput` + `mat-form-field` over raw inputs
+**Styling rules:**
+- Use `--mat-*` CSS custom properties, never hardcoded hex colors
+- Match spacing, border-radius, and shadow exactly to the design
+- Use the design's exact values as CSS custom property overrides in `:host`
 
-### Step 8: Type Model
-
-Create a TypeScript interface for the component's data model in `models/`:
+### Step 9: Implement the Form (if applicable)
 
 ```typescript
-// [feature].model.ts
-export interface [Feature] {
-  readonly id: string;
-  readonly name: string;
-  // ... typed fields matching Stitch design data
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
+
+// In @Component imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, ...]
+
+private readonly fb = inject(FormBuilder);
+
+form = this.fb.nonNullable.group({
+  // One control per detected form field
+  email: ['', [Validators.required, Validators.email]],
+  password: ['', [Validators.required, Validators.minLength(8)]],
+  // ... add controls matching every field in the design
+});
+
+onSubmit(): void {
+  if (this.form.invalid) return;
+  // handle submission
 }
 ```
 
-### Step 9: Mock Data
+**Form template pattern:**
+```html
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <mat-form-field appearance="outline">
+    <mat-label>Email</mat-label>
+    <input matInput type="email" formControlName="email" placeholder="you@example.com">
+    <mat-error>
+      @if (form.controls.email.hasError('required')) { Email is required }
+      @if (form.controls.email.hasError('email')) { Enter a valid email }
+    </mat-error>
+  </mat-form-field>
 
-Extract static/example data to `shared/data/mock-data.ts`:
+  <button mat-flat-button type="submit" [disabled]="form.invalid || isLoading()">
+    @if (isLoading()) { <mat-spinner diameter="20"/> } @else { Submit }
+  </button>
+</form>
+```
 
+- Every field from the design gets a `mat-form-field`
+- Every validation rule inferred from the design gets a `Validator` and a `<mat-error>`
+- Password fields get a show/hide toggle using a `signal(false)` for `showPassword`
+- Disabled/loading states use signals bound to `[disabled]`
+
+### Step 10: Register Route (if applicable)
+
+In `src/app/app.routes.ts`:
 ```typescript
-// mock-data.ts
-import type { [Feature] } from '../[feature]/models/[feature].model';
-
-export const MOCK_[FEATURES]: readonly [Feature][] = [
-  { id: '1', name: 'Example', ... },
-];
+{
+  path: '[route]',
+  loadComponent: () =>
+    import('./[feature]/[component-name]/[component-name].component')
+      .then(m => m.[ComponentName]Component),
+  title: '[Page Title]',
+},
 ```
 
-### Step 10: Validate
-
-Run validation script:
+### Step 11: Validate
 
 ```bash
-npm run validate src/app/[feature]/components/[component].component.ts
+node scripts/validate.js src/app/[feature]/[component-name]/[component-name].component.ts
 ```
 
-Checks:
-- Component has `standalone: true`
-- Uses `input()` signal functions (not `@Input()` decorator)
-- Uses `ChangeDetectionStrategy.OnPush`
-- No hardcoded hex colors
-- TypeScript interface defined for component data
-
-### Step 11: Build Verification
-
-If `angular:build` (experimental) is available:
-```
-angular:build project="[app-name]"
-```
-
-Otherwise:
+Then build:
 ```bash
-ng build --configuration=development 2>&1 | tail -20
+ng build
 ```
 
-Fix any TypeScript or template compilation errors before proceeding.
+Fix any TypeScript or build errors before proceeding.
 
-### Step 12: Visual Verification with Playwright MCP
+### Step 12: Playwright Visual Verification
 
-Start dev server (use Angular MCP experimental if available):
-```
-angular:devserver.start project="[app-name]"
-```
-Or:
-```bash
-ng serve &
-```
+Start the dev server, then use Playwright MCP:
 
-Then visually verify with Playwright:
-
-```
-playwright:browser_navigate url="http://localhost:4200"
-playwright:browser_snapshot   ← accessibility tree verification
-playwright:browser_screenshot ← visual comparison with temp/reference-screenshot.png
-playwright:browser_close
-```
-
-Compare the screenshot against the Stitch reference image:
-- Layout structure matches
-- Colors from DESIGN.md are applied
-- Typography looks correct
-- Interactive elements are accessible
+1. `playwright:browser_navigate` → `http://localhost:4200/[route]`
+2. `playwright:browser_screenshot` → save as `screenshots/[component-name]-actual.png`
+3. Compare with the original design image side by side
+4. Identify any deviations in: layout, spacing, colors, typography, component style
+5. Fix deviations and re-screenshot until the component matches the design
 
 ### Step 13: Architecture Checklist
 
-Review `resources/architecture-checklist.md` before marking complete.
+Run through `resources/architecture-checklist.md` before declaring done.
 
-## Angular 21 Quick Reference
+## Examples
 
-### New Control Flow Syntax (use this, not *ngFor/*ngIf)
-
-```html
-<!-- List rendering -->
-@for (item of items(); track item.id) {
-  <app-item [data]="item" />
-} @empty {
-  <p class="empty-state">No items found</p>
-}
-
-<!-- Conditional rendering -->
-@if (isLoading()) {
-  <mat-spinner />
-} @else if (hasError()) {
-  <app-error-state [message]="errorMessage()" />
-} @else {
-  <app-content />
-}
-
-<!-- Switch -->
-@switch (status()) {
-  @case ('active') { <mat-chip color="primary">Active</mat-chip> }
-  @case ('inactive') { <mat-chip>Inactive</mat-chip> }
-  @default { <mat-chip color="warn">Unknown</mat-chip> }
-}
-
-<!-- Local variable -->
-@let user = currentUser();
-<h1>Welcome, {{ user.name }}</h1>
-```
-
-### Async Data with Resource API
-
-```typescript
-// Angular 21: resource() for async data
-import { resource, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
-
-@Component({ ... })
-export class ProductListComponent {
-  private readonly http = inject(HttpClient);
-
-  readonly products = resource({
-    loader: () => firstValueFrom(
-      this.http.get<Product[]>('/api/products')
-    )
-  });
-
-  // Access: products.value(), products.isLoading(), products.error()
-}
-```
-
-### Reactive Forms with Signals
-
-```typescript
-import { Component, inject } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-
-@Component({
-  standalone: true,
-  imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule],
-  ...
-})
-export class ContactFormComponent {
-  private readonly fb = inject(FormBuilder);
-
-  readonly form = this.fb.nonNullable.group({
-    name: ['', [Validators.required, Validators.minLength(2)]],
-    email: ['', [Validators.required, Validators.email]],
-    message: ['', [Validators.required, Validators.maxLength(500)]],
-  });
-
-  submit(): void {
-    if (this.form.invalid) return;
-    // form.getRawValue() is fully typed
-    console.log(this.form.getRawValue());
-  }
-}
-```
+See `examples/activity-card.component.ts` for a complete Angular 21 component example.

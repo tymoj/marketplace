@@ -1,136 +1,168 @@
 ---
 name: design-md
-description: Analyzes a Stitch project screen and generates a comprehensive DESIGN.md file documenting the design system. Output is framework-agnostic and compatible with Angular Material theming.
-allowed-tools:
-  - "stitch*:*"
-  - "angular*:*"
-  - "Bash"
-  - "Read"
-  - "Write"
-  - "web_fetch"
+description: >-
+  Extract design tokens from local design images (PNG, JPG, Figma exports,
+  screenshots) and generate DESIGN.md with Angular Material M3 theme mapping.
+  No external MCP required — uses Claude's native image reading via Read tool.
+user-invocable: true
 ---
 
-# Design MD Skill
+# design-md
 
-Analyzes a Stitch screen and generates a `DESIGN.md` documenting its design system. The output feeds into `enhance-prompt`, `angular:components`, and `stitch-loop` skills, and can be translated into Angular Material M3 theme tokens.
+Extract design tokens from local design images and produce a `DESIGN.md` for your Angular project.
+
+## Input
+
+Provide one or more of:
+- Path to a design image: `designs/home.png`, `mockups/checkout.jpg`
+- Multiple images covering different screens of the same app
+- A folder: `designs/` — glob for images, then read each one
 
 ## Workflow
 
-### Step 1: Discover MCP Prefix
+### Step 1: Read Design Images
 
-Run `list_tools` to find the Stitch MCP prefix (may be `stitch:`, `mcp_stitch:`, or similar).
+Use the **Read tool** to load each image. Claude reads PNG, JPG, WebP, and PDF natively.
 
-Also check for `angular:get_best_practices` for Angular Material theming guidance.
+If the user gives a folder path, use Glob to list `*.{png,jpg,jpeg,webp,pdf}` inside it, then Read each file. Analyze all images before writing anything.
 
-### Step 2: Retrieve Screen Design
+### Step 2: Extract Color Palette
 
-```
-[stitch-prefix]:get_screen projectId="[PROJECT_ID]" screenId="[SCREEN_ID]"
-```
+For each distinct color visible, assign a semantic role:
 
-### Step 3: Download HTML Source
+| Role | What to look for |
+|---|---|
+| Background | Main page/screen background |
+| Surface | Card, panel, dialog backgrounds |
+| Primary | Brand/action color — filled buttons, links, active states |
+| Secondary | Supporting accent — badges, secondary buttons |
+| Text Primary | Main body text |
+| Text Secondary | Captions, labels, placeholders |
+| Text Disabled | Disabled controls |
+| Border | Dividers, input outlines, separators |
+| Error | Validation errors, destructive actions |
+| Success | Confirmation states |
+| Warning | Caution/alert states |
 
-Use Bash (not AI web fetch) to handle GCS redirects:
+Record exact hex values. If a color is not precisely readable, use the closest approximate and mark it `~`.
 
-```bash
-bash scripts/fetch-stitch.sh "[htmlCode.downloadUrl]" "temp/source.html"
-```
+### Step 3: Extract Typography
 
-### Step 4: Extract Design Tokens
+- **Font family** — infer from letterforms (geometric, humanist, serif, monospace) or mark as `system-sans`
+- For each text level: Display, Headline, Title, Body, Label, Caption → record size, weight, line-height
 
-From the HTML source, extract:
-- **Color palette** — background, surface, primary, secondary, text, border, status colors (as hex)
-- **Typography** — font families, weights, sizes, line heights, letter spacing
-- **Spacing** — padding, margins, gaps (convert to rem/px scale)
-- **Borders** — radius values, widths, styles
-- **Shadows** — box-shadow values, elevation levels
-- **Breakpoints** — any responsive media query thresholds
+### Step 4: Extract Spacing & Shape
 
-### Step 5: Translate to Natural Language
+- **Grid unit**: 4px or 8px (infer from gaps between elements)
+- **Container max-width**: widest content area
+- **Section padding** / **Card padding** / **Element gap**
+- **Border radius — small** (chips, badges) / **medium** (cards, inputs) / **large** (dialogs, sheets)
 
-Convert technical CSS values to evocative design language:
-- `box-shadow: 0 1px 2px rgba(0,0,0,0.08)` → "Whisper-soft diffused shadow"
-- `border-radius: 12px` → "Gently rounded corners"
-- `letter-spacing: 0.06em` → "Subtly airy letter spacing"
-- `font-weight: 600` → "Semi-bold, confident weight"
+### Step 5: Component Inventory
 
-### Step 6: Generate Angular Material Theme Mapping
+List every UI component visible and map to Angular Material:
 
-After the standard DESIGN.md sections, add a Section 6 with Angular Material M3 token mappings:
+| Visual Element | Style | Angular Material |
+|---|---|---|
+| Top bar | Flat / Elevated | `mat-toolbar` |
+| Card / Panel | Outlined / Filled | `mat-card` |
+| Text input | Outlined / Filled | `mat-form-field + matInput` |
+| Dropdown | Outlined / Filled | `mat-select` |
+| Checkbox | Standard | `mat-checkbox` |
+| Radio | Standard | `mat-radio-group` |
+| Toggle | Standard | `mat-slide-toggle` |
+| Button (filled) | — | `mat-flat-button` |
+| Button (outlined) | — | `mat-stroked-button` |
+| Button (text) | — | `mat-button` |
+| Icon button | — | `mat-icon-button` |
+| Table | Standard | `mat-table` |
+| Tabs | Primary / Secondary | `mat-tab-group` |
+| Chip | Filter / Assist | `mat-chip-set` |
+| Date picker | — | `mat-datepicker` |
+| Paginator | — | `mat-paginator` |
 
-```typescript
-// Angular Material M3 theme tokens derived from this design
-const theme = createTheme({
-  color: {
-    primary: createPalette(primaryHex),    // --mat-primary
-    secondary: createPalette(secondaryHex), // --mat-secondary
-    tertiary: createPalette(tertiaryHex),   // --mat-tertiary
-  },
-  typography: {
-    plain: fontFamily,
-    brand: brandFontFamily,
-  },
-  density: {
-    scale: 0,  // -1, -2, -3 for compact
-  }
-});
-```
+### Step 6: Write DESIGN.md
 
-### Step 7: Write DESIGN.md
+Write `DESIGN.md` to the project root:
 
-Output a `DESIGN.md` file with these sections:
-
-1. **Visual Theme & Atmosphere** — 2-3 sentences describing the overall aesthetic
-2. **Color Palette & Roles** — each color with hex, name, and functional role
-3. **Typography Rules** — font families, size scale, weight usage, line heights
-4. **Component Stylings** — buttons, cards, inputs, navigation, badges
-5. **Layout Principles** — max-width, columns, section spacing, mobile-first breakpoints
-6. **Angular Material Theme** — M3 token mappings + ready-to-use theme config
-
-## Output Format
-
-```markdown
-# [Project Name] Design System
+````markdown
+# [App Name] Design System
 
 ## 1. Visual Theme & Atmosphere
-[2-3 evocative sentences]
+[2–3 sentences describing the aesthetic mood inferred from the images]
 
 ## 2. Color Palette & Roles
+
 | Name | Hex | Role |
-|------|-----|------|
-| Warm Cream | #FCFAFA | Primary background |
-...
+|---|---|---|
+| [Descriptive Name] | `#hex` | [Functional role] |
 
 ## 3. Typography Rules
 - **Font:** [Family] — [description]
-- **Display:** [weight] [size] / [line-height]
-- **Body:** [weight] [size] / [line-height]
+- **Display:** [weight] [size]px / [line-height]
+- **Headline:** [weight] [size]px / [line-height]
+- **Title:** [weight] [size]px / [line-height]
+- **Body:** [weight] [size]px / [line-height]
+- **Label:** [weight] [size]px / [line-height]
+- **Caption:** [weight] [size]px / [line-height]
 
 ## 4. Component Stylings
-...
+[Describe buttons, cards, inputs, navigation as observed in the images]
 
 ## 5. Layout Principles
-...
+- Max-width: [value]px
+- Base grid: [4px / 8px]
+- Section padding: [value]
+- Card padding: [value]
+- Gap between cards: [value]
 
-## 6. Angular Material Theme (copy into your theme.scss)
+## 6. Angular Material Theme
+
 ```scss
 @use '@angular/material' as mat;
 
-$theme: mat.define-theme((
+$app-theme: mat.define-theme((
   color: (
-    theme-type: light,
-    primary: mat.$[palette]-palette,
+    theme-type: [light|dark],
+    primary: mat.$[closest-palette]-palette,
   ),
   typography: (
-    plain-family: '[font-family]',
+    plain-family: "'[Font]', sans-serif",
   ),
+  density: (scale: 0),
 ));
+
+:root {
+  @include mat.all-component-themes($app-theme);
+  --mat-app-background-color: [background-hex];
+  --mat-app-on-background: [text-primary-hex];
+  --mat-app-surface: [surface-hex];
+  --mdc-outlined-text-field-outline-color: [border-hex];
+}
 ```
 
-## 7. Design System Block (copy into Stitch prompts)
+## 7. Design System Block (copy into component prompts)
+
 **DESIGN SYSTEM (REQUIRED):**
-- Platform: Web, Desktop-first
+- Platform: Web, Desktop-first (Angular SPA)
 - Theme: [theme description]
 - Background: [Name] ([#hex])
-...
-```
+- Surface: [Name] ([#hex])
+- Primary Accent: [Name] ([#hex])
+- Text Primary: [Name] ([#hex])
+- Text Secondary: [Name] ([#hex])
+- Borders: [Name] ([#hex])
+- Font: [font-family]
+- Shape — small: [Xpx] | medium: [Xpx] | large: [Xpx]
+- Angular Material: [light|dark] theme, M3 tokens, custom brand overrides
+````
+
+### Step 7: Confirm
+
+> "`DESIGN.md` written. Section 7 is ready to paste into any component prompt."
+
+## Rules
+
+- Only record colors that are visibly present — never invent values
+- If a role has no visible color (e.g., no error state shown), omit that row
+- If multiple images conflict, use the most common value and note the discrepancy

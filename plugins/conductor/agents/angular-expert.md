@@ -8,7 +8,7 @@ skills:
   - frontend-design
   - testing-strategy
   - design-md
-  - angular-components
+  - image-to-angular
   - angular-material
 memory: project
 ---

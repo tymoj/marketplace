@@ -1,133 +1,86 @@
 ---
 name: enhance-prompt
-description: Transforms vague Stitch generation prompts into structured, detailed prompts using Angular component vocabulary and UI/UX keywords.
-allowed-tools:
-  - "stitch*:*"
-  - "angular*:*"
-  - "Read"
-  - "Write"
+description: >-
+  Transforms a rough design description or image analysis into a structured,
+  detailed Angular component specification. Produces a prompt ready to paste
+  into image-to-angular or ui-loop.
+user-invocable: true
 ---
 
-# Enhance Prompt Skill
+# enhance-prompt
 
-You are a Stitch Prompt Engineer specializing in Angular applications. Transform vague UI descriptions into structured, precise Stitch generation prompts using Angular component vocabulary.
+Turn a vague component description or quick image observation into a precise Angular Material component specification.
+
+## Input
+
+One of:
+- A rough description: "a checkout form with name, email, address, and payment fields"
+- An image path: `designs/dashboard.png` — skill reads and analyzes it
+- A partial spec: anything the user has already written about the component
 
 ## Workflow
 
-### Step 1: Assess Input
+### Step 1: Understand the Input
 
-Evaluate the user's prompt for:
-- **Target screen/page:** What is being designed?
-- **Angular context:** Is this a routed page, dialog, form, data table, dashboard?
-- **Visual style:** Modern, minimal, corporate, playful?
-- **Color preferences:** Explicit or implied
-- **Component needs:** Angular Material components appropriate for the screen
+If an image path is provided, use the **Read tool** to load it and analyze it before writing anything.
 
-### Step 2: Check for DESIGN.md
+If a text description is provided, identify what is known and what is ambiguous.
 
-- If `DESIGN.md` exists: inject the Section 7 design system block
-- If absent: append a tip: *"Run the `design-md` skill first for consistent styling across screens"*
+### Step 2: Resolve Ambiguities
 
-### Step 3: Apply Angular-Aware Enhancements
+For each ambiguous element, make a concrete decision using Angular Material best practices:
+- "a form" → list every field with type, label, placeholder, validators
+- "a table" → specify columns, sortable/filterable, paginated, row actions
+- "a dashboard" → list cards, what metric each shows, chart type if any
+- "navigation" → top toolbar or sidenav, items, active state
+- "a modal" → what triggers it, its content, confirm/cancel actions
 
-**Replace vague terms with Angular component vocabulary:**
+Do not ask the user — make sensible decisions and document them.
 
-| Vague | Angular-Specific |
-|---|---|
-| "menu at the top" | "Angular Material toolbar with navigation links and hamburger menu for mobile" |
-| "a list of items" | "Angular Material list or data table with sorting and filtering" |
-| "a button" | "Angular Material raised button (mat-raised-button) with ripple effect" |
-| "dropdown" | "Angular Material select (mat-select) with option groups" |
-| "popup" | "Angular Material dialog (MatDialog) with backdrop overlay" |
-| "loading spinner" | "Angular Material progress spinner (mat-spinner) centered in container" |
-| "sidebar" | "Angular Material sidenav (mat-sidenav-container) with responsive mode" |
-| "chips/tags" | "Angular Material chip set (mat-chip-set) with remove buttons" |
-| "date input" | "Angular Material datepicker (mat-datepicker) with calendar popup" |
-| "search" | "Angular Material form field with search icon prefix and clear suffix" |
-| "notification" | "Angular Material snackbar (MatSnackBar) bottom-center notification" |
-| "accordion" | "Angular Material expansion panel (mat-expansion-panel)" |
-| "tabs" | "Angular Material tab group (mat-tab-group) with animated ink bar" |
-| "stepper" | "Angular Material stepper (mat-stepper) horizontal or vertical" |
+### Step 3: Write the Enhanced Specification
 
-**Amplify visual quality:**
-- "modern" → "clean, minimal, with generous whitespace and subtle shadows"
-- "nice" → "polished, visually refined with consistent spacing and alignment"
-- "simple form" → "focused form with clear visual hierarchy, real-time validation feedback"
-- "dashboard" → "information-dense dashboard with clear data hierarchy and scannable metrics"
+Output a structured prompt in this format:
 
-### Step 4: Format Output
-
-```markdown
-[One-line description of the Angular screen]
+```
+[One-line description of what this screen is and does]
 
 **DESIGN SYSTEM (REQUIRED):**
-- Platform: Web, Desktop-first (Angular SPA)
-- Theme: [theme]
-- Background: [Name] ([#hex])
-- Primary Accent: [Name] ([#hex]) for CTAs and links
-- Text Primary: [Name] ([#hex])
-- Font: [font-family]
-- Angular Material: [light|dark] theme, M3 design tokens
+[Paste Section 7 from DESIGN.md if available, or describe colors/font/theme]
 
 **Angular Component Structure:**
-- Layout: [Angular Material layout component]
-- Header: [mat-toolbar | custom header component]
-- Main: [mat-sidenav-container | router-outlet | mat-card grid]
-- Forms: [Angular reactive forms | template-driven]
-- Navigation: [Angular Router links | mat-nav-list]
+- Layout: [Full-width page / Centered card / Sidebar + content / Grid]
+- Container: [max-width value]px centered
+- Header: [Shared mat-toolbar / Page-specific header / None]
+- Data: [Mock data / resource() from HTTP service / FormBuilder]
+- Change detection: OnPush
+- Standalone: true
 
 **Page Structure:**
-1. **[Section name]:** [detailed description with Angular Material components]
-2. **[Section name]:** [detailed description]
+1. **[Section Name]:** [Angular Material components] — [description]
+2. **[Section Name]:** [Angular Material components] — [description]
 ...
 
-**Interaction Notes:**
-- [Angular-specific behavior, e.g., "Form shows real-time validation with mat-error"]
-- [e.g., "Table rows clickable, navigate to detail route via Angular Router"]
-- [e.g., "Mobile: mat-sidenav collapses to hamburger menu"]
+**Form Fields (if applicable):**
+| # | Label | Type | Placeholder | Required | Validators | Error message |
+|---|---|---|---|---|---|---|
+| 1 | [label] | [input type] | [placeholder] | [yes/no] | [Validators.x] | [message] |
+
+**States to Implement:**
+- Default: [description]
+- Loading: [skeleton / spinner — which components]
+- Empty: [mat-icon + heading + action button]
+- Error: [inline error / snackbar / error card]
+- [Other states visible in design]
+
+**Angular Material Imports Required:**
+- [MatXxxModule]
+- [MatYyyModule]
 ```
 
-### Step 5: Output Options
+### Step 4: Deliver
 
-- Return as text (default)
-- Write to `next-prompt.md` with YAML frontmatter (for `stitch-loop`)
-- Write to custom filename
+Output the enhanced specification. The user can paste it directly into the `ui-loop` baton or the `image-to-angular` skill.
 
-## Examples
+## Angular Material Vocabulary Reference
 
-### Input (vague)
-```
-Make a user settings page with profile info and password change
-```
-
-### Output (enhanced)
-```
-Angular user settings page with tabbed layout for profile and security management
-
-**DESIGN SYSTEM (REQUIRED):**
-- Platform: Web, Desktop-first (Angular SPA)
-- Theme: Clean, professional, task-focused
-- Background: White (#FFFFFF) / Light Gray (#F5F5F5) sections
-- Primary Accent: Deep Blue (#1976D2) for CTAs
-- Font: Roboto, Angular Material default
-
-**Angular Component Structure:**
-- Layout: Centered mat-card (640px max-width) inside full-height router-outlet
-- Header: Page title with mat-icon breadcrumb
-- Main: mat-tab-group with "Profile" and "Security" tabs
-- Forms: Reactive forms with FormBuilder, mat-form-field throughout
-- Save: mat-raised-button triggering HTTP PUT with loading state
-
-**Page Structure:**
-1. **Page Header:** "Account Settings" heading (H2) with last-updated timestamp caption
-2. **Tab Group:** Angular Material tab group — "Profile" tab active by default
-3. **Profile Tab:** Avatar upload (mat-icon-button + hidden file input), full name / email / bio fields (mat-form-field), timezone mat-select, "Save Changes" mat-raised-button
-4. **Security Tab:** Current password field, new password with strength indicator (mat-progress-bar), confirm password with match validation, "Update Password" mat-stroked-button
-5. **Danger Zone:** Delete account section (mat-card with warn theme), confirmation dialog trigger (MatDialog)
-
-**Interaction Notes:**
-- Form shows inline mat-error messages on blur
-- Save button shows mat-spinner while request is in-flight
-- Success/error shown via MatSnackBar bottom notification
-- Unsaved changes trigger Angular CanDeactivate guard confirmation dialog
-```
+See `references/KEYWORDS.md` for the complete component name and vocabulary mapping.
